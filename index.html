@@ -21,7 +21,7 @@ h1{font:400 clamp(28px,6vw,56px) Michroma,sans-serif;letter-spacing:.14em;margin
 #pz{right:var(--r);top:var(--t);width:44px;height:44px;border-radius:50%;pointer-events:auto;color:#fff;padding:0;border:1px solid rgba(255,255,255,.2);background:var(--gl);display:flex;align-items:center;justify-content:center}
 #th{right:calc(var(--r) + 56px);top:calc(var(--t) + clamp(94px,12.5vw,134px));width:clamp(120px,15vw,160px)}.bar{height:10px;background:rgba(255,255,255,.15);transform:skewX(-20deg);margin-top:5px}.bar i{display:block;height:100%;width:100%;background:var(--cy);box-shadow:0 0 10px var(--cy)}
 .kb{left:var(--l);top:calc(var(--t) + clamp(110px,14vw,150px));padding:10px 14px;font-size:12px;line-height:2.1;color:#cfd5e2}
-.tl{left:var(--l);bottom:var(--b);display:flex;gap:12px}.tr{right:var(--r);bottom:var(--b);display:flex;gap:12px;align-items:flex-end}
+.tl{right:var(--r);bottom:var(--b);display:flex;gap:12px}.tr{left:var(--l);bottom:var(--b);display:flex;gap:12px;align-items:flex-end}
 .tl button,.tr button{pointer-events:auto;width:clamp(54px,7vw,72px);aspect-ratio:1;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(10,13,20,.55);color:#fff;display:flex;align-items:center;justify-content:center;padding:0;touch-action:none}
 .tr .fly{width:clamp(70px,9vw,96px);border:3px solid var(--cy);background:rgba(26,167,255,.2);box-shadow:0 0 18px var(--cy);color:var(--cy)}
 svg.i{width:45%;height:45%;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -29,6 +29,10 @@ svg.i{width:45%;height:45%;fill:none;stroke:currentColor;stroke-width:1.8;stroke
 .nr{display:inline-block;background:var(--red);padding:6px 14px;border-radius:6px;font-size:12px;letter-spacing:.15em;margin-top:14px}
 #hp{right:calc(var(--r) + 56px);top:calc(var(--t) + clamp(94px,12.5vw,134px) + 42px);width:clamp(120px,15vw,160px)}#gp{right:calc(var(--r) + 56px);top:calc(var(--t) + clamp(94px,12.5vw,134px) + 84px);width:clamp(120px,15vw,160px)}#hp .bar i,#gp .bar i{box-shadow:none;transition:background .2s}
 #al{left:50%;top:38%;transform:translate(-50%,-50%);padding:16px 30px;border-radius:10px;background:rgba(200,30,50,.94);font:700 clamp(16px,3vw,32px) Montserrat,sans-serif;letter-spacing:.12em;text-align:center}
+#prog{left:0;right:0;top:0;transform:none;width:auto;height:4px;border-radius:0}
+#rot{display:none;position:fixed;inset:0;z-index:9;background:#06080d;align-items:center;justify-content:center;text-align:center;padding:30px;font:600 18px Montserrat,sans-serif;letter-spacing:.12em;line-height:1.7}
+@media (max-height:500px){#ban{padding:5px 14px;max-width:42vw;font-size:10px}#ban b{font-size:13px;letter-spacing:.08em}#sc1{padding:7px 10px;width:112px}#hp,#th{width:112px}}
+@media (orientation:portrait) and (pointer:coarse){#rot{display:flex}}
 @media (pointer:coarse){.kb{display:none}}
 </style></head><body>
 <canvas id="c"></canvas>
@@ -49,13 +53,14 @@ svg.i{width:45%;height:45%;fill:none;stroke:currentColor;stroke-width:1.8;stroke
 <button class="btn" id="play">PLAY GAME</button>
 <div class="gl ctl"><small>CONTROLS</small>Keyboard: <span class="k">←</span><span class="k">→</span> steer <span class="k">↑</span><span class="k">↓</span> gas / brake <span class="k">SPACE</span> fly <span class="k">P</span> pause<br>Touch: left / right buttons steer, pedal accelerates, bolt flies<br>Stay on the road (edges damage the car). Fly over traffic, people at signals and road blocks.</div>
 <p class="tag" style="margin-top:20px">BEST SCORE <b id="best" style="color:#fff;letter-spacing:.1em;font-size:16px"></b></p></div></div>
+<div id="rot">Please rotate your phone to landscape to play</div>
 <div id="done" class="ov hide"><div><span class="tag">FLYING ROADSTER</span><h1 id="dt" style="font-size:clamp(22px,4vw,34px);letter-spacing:.3em">RACE COMPLETE</h1>
 <div class="st"><div class="gl"><small>DISTANCE</small><b id="rd">0</b></div><div class="gl"><small>TOP SPEED</small><b id="rt">0</b></div><div class="gl"><small>SCORE</small><b id="rs">0</b></div><div class="gl"><small>ENERGY COLLECTED</small><b id="re">0</b></div></div>
 <span class="nr hide" id="nr">NEW RECORD</span><br><button class="btn o" id="again">REPLAY</button><button class="btn" id="tomenu">BACK TO MENU</button></div></div>
 <script>
 const $=i=>document.getElementById(i),cv=$('c'),g=cv.getContext('2d');let W,H;
 const rs=()=>{const d=Math.min(devicePixelRatio||1,2);W=cv.width=innerWidth*d;H=cv.height=innerHeight*d};addEventListener('resize',rs);rs();
-const SL=200,RW=2000,CH=1000,D=.84,DR=130,NS=1800,MV=15000,TL=NS*SL,JS=850*SL,JE=1000*SL,BZ=1680*SL,LN=[-.75,-.25,.25,.75],CZ=[],SG=[1300,1420,1540],MN=13000;
+const SL=200,RW=2000,CH=1200,D=.84,DR=130,NS=1800,MV=15000,TL=NS*SL,JS=850*SL,JE=1000*SL,BZ=1680*SL,LN=[-.75,-.25,.25,.75],CZ=[],SG=[1300,1420,1540],MN=13000;
 const ZN=[{s:['#3f78bd','#f7ddb8'],g:['#6aa84f','#5f9a47'],r:['#4a4c54','#45474f'],m:['#d33','#fff'],h:'#7d9c8a'},{s:['#4d84c4','#bcd5ea'],g:['#8d9b5c','#849254'],r:['#505259','#4b4d54'],m:['#c33','#eee'],h:'#8fa3b8'},{s:['#22355f','#f2a977'],g:['#3b3d46','#363842'],r:['#34363d','#303239'],m:['#a33','#ccc'],h:'#4a5878'}];
 const zi=i=>i<600?0:i<1200?1:2,tr=i=>(Math.sin(i*12.9898)*43758.5453%1+1)%1;
 const cu=i=>{const z=zi(i);return z==0?3*Math.sin(i/90):z==1?(i>800&&i<1050?0:1.2*Math.sin(i/130)):(i>1600&&i<1750?0:2*Math.sin(i/70))};
@@ -119,7 +124,7 @@ l=g.createLinearGradient(0,y-.46*w,0,y);l.addColorStop(0,'#fdfcf8');l.addColorSt
 g.fillStyle='#14161c';g.fillRect(x-.46*w,y-.4*w,.92*w,.12*w);g.shadowColor='#f22';g.shadowBlur=w*.08;g.fillStyle='#ff4a40';g.fillRect(x-.42*w,y-.36*w,.84*w,.04*w);g.shadowBlur=0;
 g.fillStyle='#090a0d';g.fillRect(x-.52*w,y-.1*w,1.04*w,.1*w);g.fillStyle='#1a1e27';[-.28,.28].forEach(d=>{g.beginPath();g.ellipse(x+d*w,y-.05*w,.09*w,.035*w,0,0,7);g.fill();g.strokeStyle='#6fd3ff';g.stroke()});
 g.fillStyle='#ecebe5';g.fillRect(x-.62*w,y-.9*w,1.24*w,.07*w);g.fillStyle='#d6d3cb';g.fillRect(x-.64*w,y-.98*w,.04*w,.2*w);g.fillRect(x+.6*w,y-.98*w,.04*w,.2*w)}
-function draw(){const si=Math.floor(S.pos/SL),bp=S.pos%SL/SL,zn=zi(si),z=ZN[zn],cx=S.px*RW,cy=S.cy,cz=S.pos-840,hz=H/2,gn=S.cy>200;
+function draw(){const si=Math.floor(S.pos/SL),bp=S.pos%SL/SL,zn=zi(si),z=ZN[zn],cx=S.px*RW,cy=S.cy,cz=S.pos-1440,hz=H/2,gn=S.cy>200;
 g.save();if(S.sh>0)g.translate((Math.random()-.5)*14,(Math.random()-.5)*14);g.translate(W/2,H*.8);g.rotate(S.ang);g.translate(-W/2,-H*.8);
 const gr=g.createLinearGradient(0,0,0,hz);gr.addColorStop(0,z.s[0]);gr.addColorStop(1,z.s[1]);g.fillStyle=gr;g.fillRect(-W,-H,3*W,hz+H);
 g.fillStyle=z.g[0];g.fillRect(-W,hz,3*W,2*H);g.fillStyle=z.h;g.beginPath();g.moveTo(-W,hz);
@@ -135,10 +140,10 @@ else if(zz==1&&p.i%8==0)[-1,1].forEach(d=>{const h=s*500*W/2,xx=p.X1+d*1.2*k;g.f
 else if(zz==2&&p.i%6==0)[-1,1].forEach((d,j)=>{const w=(1500+tr(p.i+j)*1000),h=(3000+tr(p.i*3+j)*7000);bld(p.X1+d*(1.35*RW+w/2)*s*W/2,p.Y1,w*s*W/2,h*s*W/2,p.i+j)});
 if(p.i==BZ/SL){const h=s*700*W/2,w=p.w1*1.1;for(let b=0;b<14;b++){g.fillStyle=b%2?'#f4f2ec':'#d9372b';g.fillRect(p.X1-w+b*w/7,p.Y1-h,w/7+1,h*.45)}g.fillStyle='#c4302b';g.fillRect(p.X1-h*.5,p.Y1-h*1.9,h,h*.6);g.fillStyle='#fff';g.font='bold '+h*.16+'px sans-serif';g.textAlign='center';g.fillText('ROAD CLOSED',p.X1,p.Y1-h*1.55)}
 (B[n]||[]).forEach(c=>{const sx=p.X1+c.x*k;if(c.o){const r=s*220*W/2;g.fillStyle='rgba(26,167,255,.35)';g.beginPath();g.arc(sx,p.Y1-r*1.6,r*2,0,7);g.fill();g.fillStyle='#0c2b5c';g.beginPath();g.arc(sx,p.Y1-r*1.6,r,0,7);g.fill();g.strokeStyle='#1aa7ff';g.lineWidth=Math.max(1,r*.15);g.stroke();g.fillStyle='#fff';poly([[sx+r*.2,p.Y1-r*2.4],[sx-r*.4,p.Y1-r*1.5],[sx,p.Y1-r*1.5],[sx-r*.2,p.Y1-r*.8],[sx+r*.4,p.Y1-r*1.7],[sx,p.Y1-r*1.7]],'#fff')}else if(c.ped)person(sx,p.Y1,s,c.x);else car(sx,p.Y1,s*RW*.42*W/2,c.c,c.t??(c.t=(Math.random()*3)|0),c.v<3000)})}
-g.restore();if(S.inv<=0||Math.floor(S.inv*10)%2)rdst(W/2,H*.9,Math.min(W*.2,H*.46),S.air);g.save();
+g.restore();if(S.inv<=0||Math.floor(S.inv*10)%2)rdst(W/2,H*.84,Math.min(W*.14,H*.31),S.air);g.save();
 g.restore()}
 function hudu(){$('sc').textContent=Math.floor(S.sc).toLocaleString();$('di').textContent=(S.pos/100000).toFixed(1)+' km';$('kh').textContent=Math.round(S.sp/MV*215);$('arc').setAttribute('stroke-dasharray',(198*S.sp/MV)+' 264');$('en').style.width=S.en+'%';$('pr').style.width=(S.pos/TL*100)+'%';
-const nz=CZ.find(z=>S.pos<z[0]&&z[0]-S.pos<30000),sg=SG.some(s=>s*SL-S.pos>-200&&s*SL-S.pos<22000);let b=null;if(st=='pause')b=['PAUSED','Press P to resume','#444'];else if(S.cl)b=['FULL LOOP','Hold your speed all the way round','#6a3fb5'];else if(S.pos<JE&&JS-S.pos<30000)b=['HEAVY TRAFFIC AHEAD','Hold SPACE (or the bolt) to fly over the cars','rgba(200,30,50,.9)'];else if(sg)b=['PEOPLE AT THE SIGNAL','Hold SPACE to fly over the crossing','rgba(214,110,20,.92)'];else if(S.pos<BZ&&BZ-S.pos<30000)b=['ROAD BLOCKED','Hold SPACE to fly over the barrier','rgba(214,110,20,.92)'];
+const nz=CZ.find(z=>S.pos<z[0]&&z[0]-S.pos<30000),sg=SG.some(s=>s*SL-S.pos>-200&&s*SL-S.pos<22000);let b=null;if(st=='pause')b=['PAUSED','Press P to resume','#444'];else if(S.cl)b=['FULL LOOP','Hold your speed all the way round','#6a3fb5'];else if(S.pos<JE&&JS-S.pos<30000)b=['HEAVY TRAFFIC AHEAD','Hold SPACE (or the bolt) to fly over the cars','rgba(200,30,50,.9)'];else if(sg)b=['PEOPLE AT THE SIGNAL','Hold SPACE or the bolt to fly over the crossing','rgba(214,110,20,.92)'];else if(S.pos<BZ&&BZ-S.pos<30000)b=['ROAD BLOCKED','Hold SPACE or the bolt to fly over the barrier','rgba(214,110,20,.92)'];
 const col=v=>v>50?'#2ecc71':v>25?'#f2c14e':'#e4173a';$('hpb').style.width=S.hp+'%';$('hpb').style.background=col(S.hp);$('gp').classList.toggle('hide',!CZ.some(z=>S.pos<z[1]&&z[0]-S.pos<30000));const lv=Math.min(100,S.sp/MN*100);$('gpb').style.width=lv+'%';$('gpb').style.background=lv>=100?'#2ecc71':lv>80?'#f2c14e':'#e4173a';const a=$('al');a.classList.toggle('hide',S.al<=0);if(S.al>0)a.textContent='NOT ENOUGH SPEED FOR THE LOOP: YOU FELL BACK';const e=$('ban');e.classList.toggle('hide',!b);if(b){$('bt').textContent=b[0];$('bs').textContent=b[1];e.style.background=b[2]}}
 function start(){reset();st='play';['menu','done'].forEach(i=>$(i).classList.add('hide'));$('hud').classList.remove('hide')}
 function end(w){st='done';$('hud').classList.add('hide');const sc=Math.floor(S.sc),nr=sc>best;if(nr){best=sc;try{localStorage.setItem('fr_best',sc)}catch(e){}}
